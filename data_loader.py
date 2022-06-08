@@ -34,17 +34,14 @@ class Lung_loader(Dataset):
     def __getitem__(self, idx):
         down_img_path = self.down_paths[idx]
         org_img_path = self.org_paths[idx]
-        down_img = torch.tensor(nib.load(down_img_path).get_fdata())
-        org_img = torch.tensor(nib.load(org_img_path).get_fdata())
-
-        print(down_img_path, org_img_path)
+        down_img = torch.tensor(normalizeVolumes(nib.load(down_img_path).get_fdata()))
+        org_img = torch.tensor(normalizeVolumes(nib.load(org_img_path).get_fdata()))
 
         x_offset, y_offset, z_offset = (random.randint(-60, 60), random.randint(-60, 60), random.randint(-60, 60))
 
         voxel_coord = (
             org_img.shape[0] // 2 - x_offset, org_img.shape[1] // 2 - y_offset, org_img.shape[2] // 2 - z_offset)
 
-        print(voxel_coord)
 
         img_patch = org_img[
                     int(voxel_coord[0] - self.patch_size[0] / 2):int(voxel_coord[0] + self.patch_size[0] / 2),
