@@ -23,12 +23,18 @@ folder_path = 'Users/niklaskoser/Desktop/results'
 
 train_set = Lung_loader(down_img_paths[:30], org_img_paths[:30])
 val_set = Lung_loader(down_img_paths[30:], org_img_paths[30:])
-
-plt.imshow(val_set[0][0][0, :, 32, :].cpu().rot90().numpy(), 'gray')
+imgs = val_set[0]
+plt.imshow(imgs[0][0, :, 32, :].cpu().rot90().numpy(), 'gray')
 plt.show()
+
+plt.imshow(imgs[1][0, :, 32, :].cpu().rot90().numpy(), 'gray')
+plt.show()
+
 
 train_loader = DataLoader(train_set, batch_size=1, shuffle=True)
 val_loader = DataLoader(val_set, batch_size=1, shuffle=True)
+
+
 
 model = ResUnet3D(channel=1)
 

@@ -38,7 +38,7 @@ class ResUnet3D(nn.Module):
 
         self.output_layer = nn.Sequential(
             nn.Conv3d(filters[0], self.n_classes, 1, 1, padding_mode=padding_mode),
-            #nn.Softmax(dim=32),
+            # nn.Softmax(dim=32),
         )
 
     def forward(self, x):
