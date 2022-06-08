@@ -6,10 +6,11 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 import pandas as pd
-from data_loader import Lung_loader
+from data_loader import Lung_loader, normalizeVolumes
 from resUnet import ResUnet3D
-import pytorch_ssim #!pip install git+https://github.com/jinh0park/pytorch-ssim-3D.git
+import pytorch_ssim  # !pip install git+https://github.com/jinh0park/pytorch-ssim-3D.git
 
+from sliding_window import predict_3D
 from utils import PSNR
 
 down_img_paths = glob(os.path.join('/Users/niklaskoser/Desktop/down_samesize/Training', '*.nii.gz'))
@@ -20,7 +21,6 @@ org_img_paths.sort()
 exp_name = 'test_I'
 folder_path = 'Users/niklaskoser/Desktop/results'
 
-
 train_set = Lung_loader(down_img_paths[:30], org_img_paths[:30])
 val_set = Lung_loader(down_img_paths[30:], org_img_paths[30:])
 imgs = val_set[0]
@@ -30,11 +30,8 @@ plt.show()
 plt.imshow(imgs[1][0, :, 32, :].cpu().rot90().numpy(), 'gray')
 plt.show()
 
-
 train_loader = DataLoader(train_set, batch_size=1, shuffle=True)
 val_loader = DataLoader(val_set, batch_size=1, shuffle=True)
-
-
 
 model = ResUnet3D(channel=1)
 
@@ -121,3 +118,14 @@ df = pd.DataFrame([losses_validate, losses_training, psnrs, ssims])
 df = (df.transpose())
 df.columns = ["Validation", "Training", "PSNR", "SSIM"]
 df.to_csv(os.path.join(folder_path, "val_loss.csv"))
+
+# prediction
+org_patches, t, rec_img, nb_pred = predict_3D(x=rec.squeeze(0),
+                                              patch_size=(64, 64, 64),
+                                              use_gaussian=False,
+                                              step_size=0.8, gen=model.cuda())
+nb_pred = torch.tensor(nb_pred).unsqueeze(0).cpu()
+rec_img = torch.tensor(rec_img).cpu()
+rec_img = rec_img / nb_pred
+
+r = normalizeVolumes(rec_img)
