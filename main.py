@@ -6,7 +6,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 import pandas as pd
-from data_loader import Lung_loader, normalizeVolumes
+from data_loader import Lung_patch_loader, normalizeVolumes
 from resUnet import ResUnet3D
 import pytorch_ssim  # !pip install git+https://github.com/jinh0park/pytorch-ssim-3D.git
 
@@ -21,8 +21,8 @@ org_img_paths.sort()
 exp_name = 'test_I'
 folder_path = 'Users/niklaskoser/Desktop/results'
 
-train_set = Lung_loader(down_img_paths[:30], org_img_paths[:30])
-val_set = Lung_loader(down_img_paths[30:], org_img_paths[30:])
+train_set = Lung_patch_loader(down_img_paths[:30], org_img_paths[:30])
+val_set = Lung_patch_loader(down_img_paths[30:], org_img_paths[30:])
 imgs = val_set[0]
 plt.imshow(imgs[0][0, :, 32, :].cpu().rot90().numpy(), 'gray')
 plt.show()

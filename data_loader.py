@@ -15,7 +15,7 @@ def normalizeVolumes(npzarray):
     return npzarray
 
 
-class Lung_loader(Dataset):
+class Lung_patch_loader(Dataset):
 
     def __init__(self, down_paths, org_paths, transform=None, patch_size=(64, 64, 64)):
         """
@@ -42,7 +42,6 @@ class Lung_loader(Dataset):
         voxel_coord = (
             org_img.shape[0] // 2 - x_offset, org_img.shape[1] // 2 - y_offset, org_img.shape[2] // 2 - z_offset)
 
-
         img_patch = org_img[
                     int(voxel_coord[0] - self.patch_size[0] / 2):int(voxel_coord[0] + self.patch_size[0] / 2),
                     int(voxel_coord[1] - self.patch_size[1] / 2):int(voxel_coord[1] + self.patch_size[1] / 2),
@@ -68,3 +67,30 @@ class Lung_loader(Dataset):
             pass
 
         return down_patch.unsqueeze(0), img_patch.unsqueeze(0)
+
+
+class Lung_loader(Dataset):
+    def __init__(self, down_paths, org_paths, transform=None, patch_size=(64, 64, 64)):
+        """
+        :param down_paths: path to the downsample CT-Scans
+        :param org_paths: path to the original CT-Scans
+        """
+
+        self.down_paths = down_paths
+        self.org_paths = org_paths
+        self.transform = transform
+        self.patch_size = patch_size
+
+    def __len__(self):
+        return len(self.down_paths)
+
+    def __getitem__(self, idx):
+        down_img_path = self.down_paths[idx]
+        org_img_path = self.org_paths[idx]
+        down_img = torch.tensor(normalizeVolumes(nib.load(down_img_path).get_fdata()))
+        org_img = torch.tensor(normalizeVolumes(nib.load(org_img_path).get_fdata()))
+
+        if self.transform:
+            pass
+
+        return down_img.unsqueeze(0), org_img.unsqueeze(0)
