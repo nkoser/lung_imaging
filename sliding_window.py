@@ -85,7 +85,7 @@ def _internal_predict_3D_3Dconv_tiled(x: np.ndarray, step_size: float,
     if verbose:
         print("data shape:", data_shape)
         print("patch size:", patch_size)
-        print("steps (x, y, and z):", steps)
+        print("steps (x, y, and z):", c)
         print("number of tiles:", num_tiles)
 
     # we only need to compute that once. It can take a while to compute this due to the large sigma in
@@ -177,63 +177,3 @@ def _internal_predict_3D_3Dconv_tiled(x: np.ndarray, step_size: float,
     aggregated_results = aggregated_results[slicer]
     aggregated_nb_of_predictions = aggregated_nb_of_predictions[slicer]
     return org_patches, patches, aggregated_results, aggregated_nb_of_predictions
-
-# if __name__ == '__main__':
-#    path = 'G:/LUNA/subset0/1.3.6.1.4.1.14519.5.2.1.6279.6001.105756658031515062000744821260.mhd'
-#    itk_image = SimpleITK.ReadImage(path)
-#    img = SimpleITK.GetArrayFromImage(itk_image)
-#    plt.imshow(img[60, :, :], cmap='gray')
-#    plt.show()
-#
-#    t, rec_img, nb_pred = predict_3D(x=torch.tensor(img).unsqueeze(0), patch_size=(64, 64, 64), use_gaussian=True,
-#                                     step_size=0.8)
-#    rec_img = rec_img / nb_pred
-#    plt.imshow(rec_img[0, 60, :, :], cmap='gray')
-#    plt.show()
-#
-#    plt.imshow(nb_pred[0, 60, :, :], cmap='gray')
-#    plt.show()
-#
-#    diff = rec_img[0, 60, :, :] - img[60, :, :]
-#    plt.imshow(diff, cmap='gray')
-#    plt.show()
-
-#             if all_in_gpu:
-#                 predicted_patch = predicted_patch.half()
-#             else:
-#                 predicted_patch = predicted_patch.cpu().numpy()
-#
-#             aggregated_results[:, lb_x:ub_x, lb_y:ub_y, lb_z:ub_z] += predicted_patch
-#             aggregated_nb_of_predictions[:, lb_x:ub_x, lb_y:ub_y, lb_z:ub_z] += add_for_nb_of_preds
-#
-# # we reverse the padding here (remeber that we padded the input to be at least as large as the patch size
-# slicer = tuple(
-#     [slice(0, aggregated_results.shape[i]) for i in
-#      range(len(aggregated_results.shape) - (len(slicer) - 1))] + slicer[1:])
-# aggregated_results = aggregated_results[slicer]
-# aggregated_nb_of_predictions = aggregated_nb_of_predictions[slicer]
-#
-# # computing the class_probabilities by dividing the aggregated result with result_numsamples
-# class_probabilities = aggregated_results / aggregated_nb_of_predictions
-#
-# if regions_class_order is None:
-#     predicted_segmentation = class_probabilities.argmax(0)
-# else:
-#     if all_in_gpu:
-#         class_probabilities_here = class_probabilities.detach().cpu().numpy()
-#     else:
-#         class_probabilities_here = class_probabilities
-#     predicted_segmentation = np.zeros(class_probabilities_here.shape[1:], dtype=np.float32)
-#     for i, c in enumerate(regions_class_order):
-#         predicted_segmentation[class_probabilities_here[i] > 0.5] = c
-#
-# if all_in_gpu:
-#     if verbose: print("copying results to CPU")
-#
-#     if regions_class_order is None:
-#         predicted_segmentation = predicted_segmentation.detach().cpu().numpy()
-#
-#     class_probabilities = class_probabilities.detach().cpu().numpy()
-#
-# if verbose: print("prediction done")
-# return predicted_segmentation, class_probabilities

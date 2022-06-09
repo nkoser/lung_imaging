@@ -1,3 +1,4 @@
+import os
 import random
 
 import torch
@@ -87,10 +88,11 @@ class Lung_loader(Dataset):
     def __getitem__(self, idx):
         down_img_path = self.down_paths[idx]
         org_img_path = self.org_paths[idx]
+        name = os.path.split(org_img_path)[-1]
         down_img = torch.tensor(normalizeVolumes(nib.load(down_img_path).get_fdata()))
         org_img = torch.tensor(normalizeVolumes(nib.load(org_img_path).get_fdata()))
 
         if self.transform:
             pass
 
-        return down_img.unsqueeze(0), org_img.unsqueeze(0)
+        return down_img.unsqueeze(0), org_img.unsqueeze(0), name
