@@ -85,7 +85,7 @@ def _internal_predict_3D_3Dconv_tiled(x: np.ndarray, step_size: float,
     if verbose:
         print("data shape:", data_shape)
         print("patch size:", patch_size)
-        print("steps (x, y, and z):", c)
+        print("steps (x, y, and z):", steps)
         print("number of tiles:", num_tiles)
 
     # we only need to compute that once. It can take a while to compute this due to the large sigma in
