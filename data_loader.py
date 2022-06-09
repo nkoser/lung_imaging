@@ -98,16 +98,14 @@ class Lung_loader(Dataset):
         origin = itk_org.GetOrigin()
         direction = itk_org.GetDirection()
 
-
         down_img = torch.tensor(sitk.GetArrayFromImage(itk_down))
         org_img = torch.tensor(sitk.GetArrayFromImage(itk_org))
 
         min_value, max_value = org_img.min(), org_img.max()
 
         down_img = normalizeVolumes(down_img)
-        
 
         if self.transform:
             pass
 
-        return down_img.unsqueeze(0), org_img.unsqueeze(0), name, spacing,origin,direction,min_value,max_value
+        return down_img.unsqueeze(0), org_img.unsqueeze(0), name, spacing, origin, direction, min_value, max_value
