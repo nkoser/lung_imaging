@@ -5,6 +5,7 @@ import torch
 import nibabel as nib
 import torch.nn.functional as F
 from torch.utils.data import Dataset
+import SimpleITK as sitk
 
 
 def normalizeVolumes(npzarray):
@@ -89,10 +90,19 @@ class Lung_loader(Dataset):
         down_img_path = self.down_paths[idx]
         org_img_path = self.org_paths[idx]
         name = os.path.split(org_img_path)[-1]
-        down_img = torch.tensor(normalizeVolumes(nib.load(down_img_path).get_fdata()))
-        org_img = torch.tensor(normalizeVolumes(nib.load(org_img_path).get_fdata()))
+
+        itk_down = sitk.ReadImage(down_img_path)
+        itk_org = sitk.ReadImage(org_img_path)
+
+        spacing = itk_org.GetSpacing()
+        origin = itk_org.GetOrigin()
+        direction = itk_org.GetDirection()
+
+
+        down_img = torch.tensor(normalizeVolumes(sitk.GetArrayFromImage(itk_down)))
+        org_img = torch.tensor(normalizeVolumes(sitk.GetArrayFromImage(itk_org)))
 
         if self.transform:
             pass
 
-        return down_img.unsqueeze(0), org_img.unsqueeze(0), name
+        return down_img.unsqueeze(0), org_img.unsqueeze(0), name, spacing,origin,direction
